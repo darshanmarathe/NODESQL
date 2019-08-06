@@ -1,24 +1,28 @@
-import * as fs from 'fs';
-import { isString } from 'util';
+import * as fs from "fs";
+import { isArray } from "util";
 
 export function FROM(data: any) {
   if (typeof data === "object") {
     return data;
-  } 
-  else if(typeof data === 'string'){
-      let item =  fs.readFileSync(data);
-      item  = JSON.parse(item.toString());
-      return item;
-  }
-  else {
-    return new Promise(resolve => {
-      console.log(data, "resolving");
-      resolve(data);
+  } else if (typeof data === "string") {
+    let item = fs.readFileSync(data);
+    item = JSON.parse(item.toString());
+    return item;
+  } else {
+    return new Promise(async (resolve) => {
+      await data().then(_data => {
+        console.log(_data)
+        resolve(_data);
+      })
     });
   }
 }
 
-export async function SELECT(args: Array<string>, FromFunc: any , whereFunc:any = undefined) {
+export function SELECT(
+  args: Array<string>,
+  FromFunc: any,
+  whereFunc: any = undefined
+) {
   let obj = {};
   let temp = null;
 
@@ -27,33 +31,42 @@ export async function SELECT(args: Array<string>, FromFunc: any , whereFunc:any 
   } else if (typeof FromFunc === "object") {
     temp = FromFunc;
   } else {
-    temp = await FromFunc();
+    temp = FromFunc();
   }
-  if(typeof whereFunc !== 'undefined' && typeof whereFunc === 'function' ){
-    debugger; 
-    const wherefun  = whereFunc();
-    temp = wherefun(temp)
+  if (typeof whereFunc !== "undefined" && typeof whereFunc === "function") {
+    debugger;
+    temp = whereFunc(temp);
   }
 
-  if (temp) {
+  if (typeof temp === undefined) {
+    return null;
+  } else if (isArray(temp)) {
+    let arr  = [];
+    for (const __item of temp) {
+      obj  = {};
+      for (const key of args) {
+        obj[key] = GetChildValue(key, __item);
+      }
+      arr.push(obj)
+    }
+    return arr;
+  } else {
     for (const key of args) {
-      obj[key] = GetChildValue(key , temp);
+      obj[key] = GetChildValue(key, temp);
     }
   }
   return obj;
 }
-export function WHERE(predicate:any){
-    console.log(predicate)
-    return function (data) {
-        console.log("data" , data)
-        return data.filter(predicate)
-    }
+export function WHERE(predicate: any) {
+  return function(data) {
+    return data.filter(predicate);
+  };
 }
-function GetChildValue(key:string , item) {
-    let retItem = item;
-    const keys = key.split('.');
-    for (const _key of keys) {
-        retItem = retItem[_key]
-    }
-    return retItem;
+function GetChildValue(key: string, item) {
+  let retItem = item;
+  const keys = key.split(".");
+  for (const _key of keys) {
+    retItem = retItem[_key];
+  }
+  return retItem;
 }
