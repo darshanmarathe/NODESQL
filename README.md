@@ -34,17 +34,18 @@
     import { SELECT, FROM, WHERE } from "./node_sql";
 
 Basic Query
-
+    
+    import { SELECT, FROM, WHERE } from "./node_sql";
     const fetch = require("node-fetch");
     const data = {
-    firstName: "Darshan",
-    lastName: "marathe",
-    age: 20,
-    status: {
-    loggedin: true,
-    time: new Date(),
-    from: "web"
-    }
+        firstName: "Darshan",
+        lastName: "marathe",
+        age: 20,
+        status: {
+            loggedin: true,
+            time: new Date(),
+            from: "web"
+        }
     };
 
   
@@ -59,9 +60,9 @@ Query JSON File
 
     let res2 = SELECT(
     
-    ["name", "models"],
-    
-    FROM("./data.json"),
+        ["name", "models"],
+        
+        FROM("./data.json"),
     
     WHERE(x => x.models.length > 2));
 
