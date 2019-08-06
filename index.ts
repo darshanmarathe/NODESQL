@@ -15,6 +15,10 @@ const data = {
 let res = SELECT(["firstName", "lastName", "status.from"], FROM(data));
 console.log(res);
 
+let resstar = SELECT(["*"], FROM(data));
+console.log("*" , resstar);
+
+
 //JSON File
 let res2 = SELECT(
   ["name", "models"],

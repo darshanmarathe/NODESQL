@@ -25,7 +25,7 @@ export function SELECT(
 ) {
   let obj = {};
   let temp = null;
-
+  
   if (typeof FromFunc === "undefined") {
     console.error("Need to pass a from function");
   } else if (typeof FromFunc === "object") {
@@ -36,6 +36,11 @@ export function SELECT(
   if (typeof whereFunc !== "undefined" && typeof whereFunc === "function") {
     debugger;
     temp = whereFunc(temp);
+  }
+  
+  if(temp != undefined && (args.length === 0 || args[0] === "*") )
+  {
+    args = Object.keys(temp);
   }
 
   if (typeof temp === undefined) {

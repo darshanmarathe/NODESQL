@@ -22,6 +22,8 @@ const data = {
 };
 let res = node_sql_1.SELECT(["firstName", "lastName", "status.from"], node_sql_1.FROM(data));
 console.log(res);
+let resstar = node_sql_1.SELECT(["*"], node_sql_1.FROM(data));
+console.log("*", resstar);
 //JSON File
 let res2 = node_sql_1.SELECT(["name", "models"], node_sql_1.FROM("./data.json"), node_sql_1.WHERE(x => x.models.length > 2));
 console.log(res2);

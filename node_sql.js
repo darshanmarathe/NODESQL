@@ -45,6 +45,9 @@ function SELECT(args, FromFunc, whereFunc = undefined) {
         debugger;
         temp = whereFunc(temp);
     }
+    if (temp != undefined && (args.length === 0 || args[0] === "*")) {
+        args = Object.keys(temp);
+    }
     if (typeof temp === undefined) {
         return null;
     }
