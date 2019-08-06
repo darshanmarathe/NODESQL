@@ -19,8 +19,23 @@
 
   
   
+   import { SELECT, FROM, WHERE } from "./node_sql";
+
+
 
 Basic Query 
+    const fetch = require("node-fetch");
+
+    const data = {
+    firstName: "Darshan",
+    lastName: "marathe",
+    age: 20,
+    status: {
+        loggedin: true,
+        time: new Date(),
+        from: "web"
+    }
+    };
 
     let  res  =  SELECT(["firstName", "lastName", "status.from"], FROM(data));
 
