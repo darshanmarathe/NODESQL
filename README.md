@@ -31,10 +31,10 @@
 
   
 
-    import { SELECT, FROM, WHERE } from "./node_sql";
+   
 
 Basic Query
-    
+
     import { SELECT, FROM, WHERE } from "./node_sql";
     const fetch = require("node-fetch");
     const data = {
