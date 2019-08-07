@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const node_sql_1 = require("./node_sql");
-const fetch = require("node-fetch");
-const data = {
+var node_sql_1 = require("./node_sql");
+var fetch = require("node-fetch");
+var data = {
     firstName: "Darshan",
     lastName: "marathe",
     age: 20,
@@ -13,7 +13,7 @@ const data = {
     }
 };
 //JSON File
-let resGroupBy = node_sql_1.SELECT(["*"], node_sql_1.FROM("./data.json"), null, node_sql_1.GROUPBY((acc, x) => {
+var resGroupBy = node_sql_1.SELECT(["*"], node_sql_1.FROM("./data.json"), null, node_sql_1.GROUPBY(function (acc, x) {
     x.modelCount = x.models.length;
     acc.push(x);
     return acc;
@@ -56,3 +56,4 @@ console.log("resGroupBy", resGroupBy);
 //   // })
 // }
 // console.log(item);
+//# sourceMappingURL=index.js.map

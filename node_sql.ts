@@ -21,7 +21,8 @@ export function FROM(data: any) {
 export function SELECT(
   args: Array<string>,
   FromFunc: any,
-  whereFunc: any = undefined
+  whereFunc: any = undefined,
+  groupByFunc: any = undefined
 ) {
   let obj = {};
   let temp = null;
@@ -34,13 +35,17 @@ export function SELECT(
     temp = FromFunc();
   }
   if (typeof whereFunc !== "undefined" && typeof whereFunc === "function") {
-    debugger;
     temp = whereFunc(temp);
   }
+
+
   
   if(temp != undefined && (args.length === 0 || args[0] === "*") )
   {
-    args = Object.keys(temp);
+    if(isArray(temp) && temp.length > 0)
+      args = Object.keys(temp[0])
+    else
+      args = Object.keys(temp);
   }
 
   if (typeof temp === undefined) {
@@ -48,23 +53,34 @@ export function SELECT(
   } else if (isArray(temp)) {
     let arr  = [];
     for (const __item of temp) {
-      obj  = {};
+      let tobj  = {};
       for (const key of args) {
-        obj[key] = GetChildValue(key, __item);
+        tobj[key] = GetChildValue(key, __item);
       }
-      arr.push(obj)
+      arr.push(tobj)
     }
-    return arr;
+    obj = arr;
   } else {
     for (const key of args) {
       obj[key] = GetChildValue(key, temp);
     }
   }
+  if (typeof groupByFunc !== "undefined" && typeof groupByFunc === "function") {
+    obj = groupByFunc(obj);
+  }
+
   return obj;
 }
 export function WHERE(predicate: any) {
   return function(data) {
     return data.filter(predicate);
+  };
+}
+
+
+export function GROUPBY(reducerFunc:any, accumulator:any) {
+  return function(data) {
+    return data.reduce(reducerFunc, accumulator);
   };
 }
 function GetChildValue(key: string, item) {
