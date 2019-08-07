@@ -109,7 +109,23 @@ Remote URLS
 
 
 
+Group By Clause
 
+    
+//JSON File With GROUP By Clause
+    
+    let resGroupBy = SELECT(
+        ["*"],
+        FROM("./data.json"),
+        null,
+        GROUPBY((acc, x) => {
+            x.modelCount = x.models.length
+            acc.push(x);
+            return acc;
+        }, [])
+    );
+    
+    console.log("resGroupBy" ,resGroupBy);
 
 
 
