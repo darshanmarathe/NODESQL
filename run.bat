@@ -1,4 +1,4 @@
 del *.js
 cls
-call tsc index.ts -t es2015 -m commonjs
-node index
+call tsc newTest.ts -t es2015 -m commonjs
+node newTest
