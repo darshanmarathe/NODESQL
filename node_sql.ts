@@ -54,8 +54,10 @@ export function SELECT(
     let arr  = [];
     for (const __item of temp) {
       let tobj  = {};
-      for (const key of args) {
-        tobj[key] = GetChildValue(key, __item);
+      for (const key of args) {  
+        const split = key.split(' ');
+        let newKey = split.length > 1 ? split[1] : split[0] 
+        tobj[newKey] = GetChildValue(split[0], __item);
       }
       arr.push(tobj)
     }
