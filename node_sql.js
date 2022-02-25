@@ -1,13 +1,15 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GROUPBY = exports.WHERE = exports.SELECT = exports.FROM = void 0;
 const fs = require("fs");
 const util_1 = require("util");
 function FROM(data) {
@@ -32,6 +34,9 @@ exports.FROM = FROM;
 function SELECT(args, FromFunc, whereFunc = undefined, groupByFunc = undefined) {
     let obj = {};
     let temp = null;
+    if (!Array.isArray(args)) {
+        args = args.split(",").map((x) => x.trim());
+    }
     if (typeof FromFunc === "undefined") {
         console.error("Need to pass a from function");
     }
@@ -45,7 +50,7 @@ function SELECT(args, FromFunc, whereFunc = undefined, groupByFunc = undefined) 
         temp = whereFunc(temp);
     }
     if (temp != undefined && (args.length === 0 || args[0] === "*")) {
-        if (util_1.isArray(temp) && temp.length > 0)
+        if ((0, util_1.isArray)(temp) && temp.length > 0)
             args = Object.keys(temp[0]);
         else
             args = Object.keys(temp);
@@ -53,14 +58,14 @@ function SELECT(args, FromFunc, whereFunc = undefined, groupByFunc = undefined) 
     if (typeof temp === undefined) {
         return null;
     }
-    else if (util_1.isArray(temp)) {
+    else if ((0, util_1.isArray)(temp)) {
         let arr = [];
         for (const __item of temp) {
-            obj = {};
+            let tobj = {};
             for (const key of args) {
-                obj[key] = GetChildValue(key, __item);
+                tobj[key] = GetChildValue(key, __item);
             }
-            arr.push(obj);
+            arr.push(tobj);
         }
         obj = arr;
     }

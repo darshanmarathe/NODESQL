@@ -19,14 +19,17 @@ export function FROM(data: any) {
 }
 
 export function SELECT(
-  args: Array<string>,
+  args: Array<string> | string,
   FromFunc: any,
   whereFunc: any = undefined,
   groupByFunc: any = undefined
 ) {
   let obj = {};
   let temp = null;
-  
+
+  if (!Array.isArray(args)) {
+    args = args.split(",").map((x) => x.trim());
+  }
   if (typeof FromFunc === "undefined") {
     console.error("Need to pass a from function");
   } else if (typeof FromFunc === "object") {

@@ -8,7 +8,12 @@ const data = {
   status: {
     loggedin: true,
     time: new Date(),
-    from: "web"
+    from: "web",
+    address : {
+      city : "Pune",
+      state : "Maharashtra",
+      country : 'India'
+    }
   }
 };
 
@@ -17,6 +22,10 @@ const data = {
 
 let res = SELECT(["firstName", "lastName", "status.from"], FROM(data));
 console.log(res);
+
+
+let resline = SELECT("firstName, lastName, status.from, status.address.city", FROM(data));
+console.log(resline);
 
 let resstar = SELECT(["*"], FROM(data));
 console.log("*" , resstar);
