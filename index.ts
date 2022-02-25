@@ -20,11 +20,11 @@ const data = {
 
 
 
-let res = SELECT(["firstName", "lastName", "status.from"], FROM(data));
+let res = SELECT(["firstName fname", "lastName lname", "status.from"], FROM(data));
 console.log(res);
 
 
-let resline = SELECT("firstName, lastName, status.from, status.address.city", FROM(data));
+let resline = SELECT("firstName, lastName, status.from from, status.address.city city", FROM(data));
 console.log(resline);
 
 let resstar = SELECT(["*"], FROM(data));

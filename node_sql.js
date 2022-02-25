@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GROUPBY = exports.WHERE = exports.SELECT = exports.FROM = void 0;
 const fs = require("fs");
-const util_1 = require("util");
 function FROM(data) {
     if (typeof data === "object") {
         return data;
@@ -23,7 +22,7 @@ function FROM(data) {
     }
     else {
         return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-            yield data().then(_data => {
+            yield data().then((_data) => {
                 console.log(_data);
                 resolve(_data);
             });
@@ -50,7 +49,7 @@ function SELECT(args, FromFunc, whereFunc = undefined, groupByFunc = undefined) 
         temp = whereFunc(temp);
     }
     if (temp != undefined && (args.length === 0 || args[0] === "*")) {
-        if ((0, util_1.isArray)(temp) && temp.length > 0)
+        if (Array.isArray(temp) && temp.length > 0)
             args = Object.keys(temp[0]);
         else
             args = Object.keys(temp);
@@ -58,18 +57,14 @@ function SELECT(args, FromFunc, whereFunc = undefined, groupByFunc = undefined) 
     if (typeof temp === undefined) {
         return null;
     }
-    else if ((0, util_1.isArray)(temp)) {
+    else if (Array.isArray(temp)) {
         let arr = [];
         for (const __item of temp) {
             let tobj = {};
             for (const key of args) {
-<<<<<<< HEAD
-                const split = key.split(' ');
+                const split = key.split(" ");
                 let newKey = split.length > 1 ? split[1] : split[0];
                 tobj[newKey] = GetChildValue(split[0], __item);
-=======
-                tobj[key] = GetChildValue(key, __item);
->>>>>>> dev
             }
             arr.push(tobj);
         }
@@ -77,7 +72,9 @@ function SELECT(args, FromFunc, whereFunc = undefined, groupByFunc = undefined) 
     }
     else {
         for (const key of args) {
-            obj[key] = GetChildValue(key, temp);
+            const split = key.split(" ");
+            let newKey = split.length > 1 ? split[1] : split[0];
+            obj[newKey] = GetChildValue(split[0], temp);
         }
     }
     if (typeof groupByFunc !== "undefined" && typeof groupByFunc === "function") {
@@ -92,6 +89,14 @@ function WHERE(predicate) {
     };
 }
 exports.WHERE = WHERE;
+function GetKeys(str) {
+    if (str.indexOf(" ") > -1) {
+        return [str, str];
+    }
+    else {
+        return [str.split(" ")[0], str.split(" ")[1]];
+    }
+}
 function GROUPBY(reducerFunc, accumulator) {
     return function (data) {
         return data.reduce(reducerFunc, accumulator);
@@ -102,7 +107,9 @@ function GetChildValue(key, item) {
     let retItem = item;
     const keys = key.split(".");
     for (const _key of keys) {
-        retItem = retItem[_key];
+        const split = _key.split(" ");
+        let newKey = split.length > 1 ? split[1] : split[0];
+        retItem = retItem[newKey];
     }
     return retItem;
 }
