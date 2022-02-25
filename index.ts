@@ -8,11 +8,70 @@ const data = {
   status: {
     loggedin: true,
     time: new Date(),
-    from: "web"
+    from: "web",
+    address : {
+      city : "Pune",
+      state : "Maharashtra",
+      country : 'India'
+    }
   }
 };
 
+
+
+
+let res = SELECT(["firstName", "lastName", "status.from"], FROM(data));
+console.log(res);
+
+
+let resline = SELECT("firstName, lastName, status.from, status.address.city", FROM(data));
+console.log(resline);
+
+let resstar = SELECT(["*"], FROM(data));
+console.log("*" , resstar);
+
+
 //JSON File
+let res2 = SELECT(
+  ["name", "models"],
+  FROM("./data.json"),
+  WHERE(x => x.models.length > 2)
+);
+
+
+console.log(res2);
+
+
+//remote url
+
+async function runQuery(){
+    let res3 = SELECT(["login", "id", "url"], FROM(await fetchData()));
+    console.log(res3);
+}
+
+runQuery();
+
+//For now Not supported Subqueries
+let item = SELECT(
+  ["models"],
+  FROM(
+    SELECT(
+      ["name", "models"],
+      FROM("./data.json"),
+      WHERE(x => x.models.length > 2)
+    )
+  )
+);
+
+async function fetchData() {
+  let response = await fetch("https://api.github.com/users/KrunalLathiya");
+  return response.json();
+ 
+}
+
+console.log(item);
+
+//JSON File With GROUP By Clause
 let resGroupBy = SELECT(
     ["*"],
     FROM("./data.json"),
@@ -25,55 +84,3 @@ let resGroupBy = SELECT(
   );
   
 console.log("resGroupBy" ,resGroupBy);
-
-
-// let res = SELECT(["firstName", "lastName", "status.from"], FROM(data));
-// console.log(res);
-
-// let resstar = SELECT(["*"], FROM(data));
-// console.log("*" , resstar);
-
-
-// //JSON File
-// let res2 = SELECT(
-//   ["name", "models"],
-//   FROM("./data.json"),
-//   WHERE(x => x.models.length > 2)
-// );
-
-
-// console.log(res2);
-
-
-// //remote url
-
-// async function runQuery(){
-//     let res3 = SELECT(["login", "id", "url"], FROM(await fetchData()));
-//     console.log(res3);
-// }
-
-// runQuery();
-
-// //For now Not supported Subqueries
-// let item = SELECT(
-//   ["models"],
-//   FROM(
-//     SELECT(
-//       ["name", "models"],
-//       FROM("./data.json"),
-//       WHERE(x => x.models.length > 2)
-//     )
-//   )
-// );
-
-// async function fetchData() {
-//   // return new Promise((resolve) => {
-//   let response = await fetch("https://api.github.com/users/KrunalLathiya");
-//   return response.json();
-//   // })
-//   // .catch(error => console.error(error))
-
-//   // })
-// }
-
-// console.log(item);
