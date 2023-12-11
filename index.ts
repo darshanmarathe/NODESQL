@@ -1,6 +1,6 @@
 import { SELECT, FROM, WHERE, GROUPBY } from "./node_sql";
 const fetch = require("node-fetch");
-
+console.clear()
 const data = {
   firstName: "Darshan",
   lastName: "marathe",
@@ -20,7 +20,7 @@ const data = {
 
 
 
-let res = SELECT(["firstName fname", "lastName lname", "status.from"], FROM(data));
+let res = SELECT(["firstName fname", "lastName lname", "status.from from"], FROM(data));
 console.log(res);
 
 
