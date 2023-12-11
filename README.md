@@ -109,6 +109,14 @@ Remote URLS
 
 
 
+Alias Support 
+
+    let resAlias = SELECT("firstName, lastName, status.from from, status.address.city city", FROM(data));
+    console.log(resAlias);
+
+
+
+
 Group By Clause
 
     
