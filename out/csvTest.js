@@ -36,82 +36,40 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var csv = require('csv-parser');
+var fs = require('fs');
 var node_sql_1 = require("./node_sql");
-var fetch = require("node-fetch");
-var data = {
-    firstName: "Darshan",
-    lastName: "marathe",
-    age: 20,
-    status: {
-        loggedin: true,
-        time: new Date(),
-        from: "web",
-        address: {
-            city: "Pune",
-            state: "Maharashtra",
-            country: 'India'
-        }
-    }
-};
-var res = (0, node_sql_1.SELECT)(["firstName fname", "lastName lname", "status.from"], (0, node_sql_1.FROM)(data));
-console.log(res);
-var resEval = (0, node_sql_1.SELECT)([function fullName(row) {
-        return row.firstName + ' ' + row.lastName;
-    }, "status.from"], (0, node_sql_1.FROM)(data));
-console.log(resEval);
-var resline = (0, node_sql_1.SELECT)("firstName, lastName, status.from from, status.address.city city", (0, node_sql_1.FROM)(data));
-console.log(resline);
-var resstar = (0, node_sql_1.SELECT)(["*"], (0, node_sql_1.FROM)(data));
-console.log("*", resstar);
-//JSON File
-var res2 = (0, node_sql_1.SELECT)(["name", "models", function ModelStr(row) {
-        return row.models.join('-');
-    }, function ModelStrLen(row) {
-        console.log(row);
-        return row.ModelStr.length;
-    }], (0, node_sql_1.FROM)("./data.json"), (0, node_sql_1.WHERE)(function (x) { return x.models.length > 2; }));
-console.log(res2);
-//remote url
-function runQuery() {
+function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var res3, _a, _b, _c;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
-                case 0:
-                    _a = node_sql_1.SELECT;
-                    _b = [["login", "id", "url"]];
-                    _c = node_sql_1.FROM;
-                    return [4 /*yield*/, fetchData()];
+        var data;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, readData('./trees.csv', function (row) {
+                        return (0, node_sql_1.SELECT)('Index, Girth, Volume(ft^3) volume', (0, node_sql_1.FROM)(row));
+                    }, function (row) {
+                        console.log(row);
+                    })];
                 case 1:
-                    res3 = _a.apply(void 0, _b.concat([_c.apply(void 0, [_d.sent()])]));
-                    console.log(res3);
+                    data = _a.sent();
                     return [2 /*return*/];
             }
         });
     });
 }
-runQuery();
-//For now Not supported Subqueries
-var item = (0, node_sql_1.SELECT)(["models"], (0, node_sql_1.FROM)((0, node_sql_1.SELECT)(["name", "models"], (0, node_sql_1.FROM)("./data.json"), (0, node_sql_1.WHERE)(function (x) { return x.models.length > 2; }))));
-function fetchData() {
-    return __awaiter(this, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("https://api.github.com/users/KrunalLathiya")];
-                case 1:
-                    response = _a.sent();
-                    return [2 /*return*/, response.json()];
-            }
+function readData(path, mapper, saver) {
+    return new Promise(function (resolve, reject) {
+        var data = [];
+        fs.createReadStream(path)
+            .pipe(csv())
+            .on('data', function (row) {
+            row = mapper(row);
+            data.push(row);
+            saver(row);
+        })
+            .on('end', function () {
+            resolve(data);
         });
     });
 }
-console.log(item);
-//JSON File With GROUP By Clause
-var resGroupBy = (0, node_sql_1.SELECT)(["*"], (0, node_sql_1.FROM)("./data.json"), null, (0, node_sql_1.GROUPBY)(function (acc, x) {
-    x.modelCount = x.models.length;
-    acc.push(x);
-    return acc;
-}, []));
-console.log("resGroupBy", resGroupBy);
-//# sourceMappingURL=index.js.map
+main();
+//# sourceMappingURL=csvTest.js.map

@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -13,7 +14,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -35,8 +36,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GROUPBY = exports.WHERE = exports.SELECT = exports.FROM = void 0;
 var fs = require("fs");
-var util_1 = require("util");
 function FROM(data) {
     var _this = this;
     if (typeof data === "object") {
@@ -69,6 +70,9 @@ function SELECT(args, FromFunc, whereFunc, groupByFunc) {
     if (groupByFunc === void 0) { groupByFunc = undefined; }
     var obj = {};
     var temp = null;
+    if (!Array.isArray(args)) {
+        args = args.split(",").map(function (x) { return x.trim(); });
+    }
     if (typeof FromFunc === "undefined") {
         console.error("Need to pass a from function");
     }
@@ -82,7 +86,7 @@ function SELECT(args, FromFunc, whereFunc, groupByFunc) {
         temp = whereFunc(temp);
     }
     if (temp != undefined && (args.length === 0 || args[0] === "*")) {
-        if (util_1.isArray(temp) && temp.length > 0)
+        if (Array.isArray(temp) && temp.length > 0)
             args = Object.keys(temp[0]);
         else
             args = Object.keys(temp);
@@ -90,23 +94,39 @@ function SELECT(args, FromFunc, whereFunc, groupByFunc) {
     if (typeof temp === undefined) {
         return null;
     }
-    else if (util_1.isArray(temp)) {
+    else if (Array.isArray(temp)) {
         var arr = [];
         for (var _i = 0, temp_1 = temp; _i < temp_1.length; _i++) {
             var __item = temp_1[_i];
-            obj = {};
+            var tobj = {};
             for (var _a = 0, args_1 = args; _a < args_1.length; _a++) {
                 var key = args_1[_a];
-                obj[key] = GetChildValue(key, __item);
+                var split = typeof key === 'function' ? key.name : key.split(" ");
+                var newKey = split.length > 1 ? split[1] : split[0];
+                if (typeof key === 'string')
+                    tobj[newKey] = GetChildValue(split[0], tobj);
+                else {
+                    var _b = GetEvalValue(tobj, key), res = _b[0], name_1 = _b[1];
+                    tobj[name_1] = res;
+                }
             }
-            arr.push(obj);
+            arr.push(tobj);
         }
-        return arr;
+        obj = arr;
     }
     else {
-        for (var _b = 0, args_2 = args; _b < args_2.length; _b++) {
-            var key = args_2[_b];
-            obj[key] = GetChildValue(key, temp);
+        //Single Object
+        for (var _c = 0, args_2 = args; _c < args_2.length; _c++) {
+            var key = args_2[_c];
+            var split = typeof key === 'function' ? key.name : key.split(" ");
+            var newKey = split.length > 1 ? split[1] : split[0];
+            // obj[newKey] = GetChildValue(split[0], temp);
+            if (typeof key === 'string')
+                obj[newKey] = GetChildValue(split[0], obj);
+            else {
+                var _d = GetEvalValue(obj, key), res = _d[0], name_2 = _d[1];
+                obj[name_2] = res;
+            }
         }
     }
     if (typeof groupByFunc !== "undefined" && typeof groupByFunc === "function") {
@@ -121,6 +141,14 @@ function WHERE(predicate) {
     };
 }
 exports.WHERE = WHERE;
+function GetKeys(str) {
+    if (str.indexOf(" ") > -1) {
+        return [str, str];
+    }
+    else {
+        return [str.split(" ")[0], str.split(" ")[1]];
+    }
+}
 function GROUPBY(reducerFunc, accumulator) {
     return function (data) {
         return data.reduce(reducerFunc, accumulator);
@@ -132,8 +160,15 @@ function GetChildValue(key, item) {
     var keys = key.split(".");
     for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
         var _key = keys_1[_i];
-        retItem = retItem[_key];
+        var split = _key.split(" ");
+        var newKey = split.length > 1 ? split[1] : split[0];
+        retItem = retItem[newKey];
     }
     return retItem;
+}
+function GetEvalValue(row, func) {
+    var name = func.name;
+    var res = func(row);
+    return [res, name];
 }
 //# sourceMappingURL=node_sql.js.map

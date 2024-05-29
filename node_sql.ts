@@ -18,7 +18,7 @@ export function FROM(data: any) {
 }
 
 export function SELECT(
-  args: Array<string> | string,
+  args: Array<string | Function> | string,
   FromFunc: any,
   whereFunc: any = undefined,
   groupByFunc: any = undefined
@@ -52,18 +52,32 @@ export function SELECT(
     for (const __item of temp) {
       let tobj = {};
       for (const key of args) {
-        const split = key.split(" ");
+        const split = typeof key === 'function' ? key.name : key.split(" ");
         let newKey = split.length > 1 ? split[1] : split[0];
-        tobj[newKey] = GetChildValue(split[0], __item);
+        if(typeof key === 'string')
+          tobj[newKey] = GetChildValue(split[0], __item);
+        else {
+          const [res , name] = GetEvalValue({...__item ,...tobj} , key)
+          tobj[name] = res; 
+
+        }
       }
       arr.push(tobj);
     }
     obj = arr;
   } else {
+    //Single Object
     for (const key of args) {
-      const split = key.split(" ");
+      const split = typeof key === 'function' ? key.name : key.split(" ");
       let newKey = split.length > 1 ? split[1] : split[0];
-      obj[newKey] = GetChildValue(split[0], temp);
+      // obj[newKey] = GetChildValue(split[0], temp);
+      if(typeof key === 'string')
+        obj[newKey] = GetChildValue(split[0], temp);
+      else {
+        const [res , name] = GetEvalValue({...temp , ...obj} , key)
+          
+        obj[name] = res
+      }
     }
   }
   if (typeof groupByFunc !== "undefined" && typeof groupByFunc === "function") {
@@ -100,4 +114,10 @@ function GetChildValue(key: string, item) {
     retItem = retItem[newKey];
   }
   return retItem;
+}
+
+function GetEvalValue(row:any, func:Function){
+  const name = func.name;
+  const res = func(row);
+  return [res , name];
 }

@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "**",
   "main": "index.js",
-  "dependencies": {
+    "dependencies": {
     "csv-parser": "^3.0.0",
     "node-fetch": "^2.6.7"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.ts"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/darshanmarathe/NODESQL#readme",
   "devDependencies": {
-    "@types/node": "^17.0.21"
+    "@types/node": "^17.0.21",
+    "nodemon": "^3.1.2",
+    "ts-node": "^10.9.2"
   }
 }

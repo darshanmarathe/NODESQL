@@ -10,7 +10,7 @@ const data = {
     time: new Date(),
     from: "web",
     address : {
-      city : "Pune",
+      city :  "Pune",
       state : "Maharashtra",
       country : 'India'
     }
@@ -18,14 +18,24 @@ const data = {
 };
 
 
+console.clear();
 
 
 let res = SELECT(["firstName fname", "lastName lname", "status.from"], FROM(data));
 console.log(res);
 
 
+let resEval = SELECT([function fullName(row:any){
+  return row.firstName + ' ' + row.lastName;
+},function reverse(row){
+  return row.fullName.length
+},  "status.from"], FROM(data));
+console.log(resEval);
+
+
 let resline = SELECT("firstName, lastName, status.from from, status.address.city city", FROM(data));
 console.log(resline);
+
 
 let resstar = SELECT(["*"], FROM(data));
 console.log("*" , resstar);
@@ -33,16 +43,19 @@ console.log("*" , resstar);
 
 //JSON File
 let res2 = SELECT(
-  ["name", "models"],
+  ["name", "models", function ModelStr(row){
+    return row.models.join('-');
+  }, function ModelStrLen(row){
+    return row.ModelStr.length;
+  }],
   FROM("./data.json"),
   WHERE(x => x.models.length > 2)
 );
 
+ console.log(res2);
 
-console.log(res2);
 
-
-//remote url
+// //remote url
 
 async function runQuery(){
     let res3 = SELECT(["login", "id", "url"], FROM(await fetchData()));
@@ -51,7 +64,7 @@ async function runQuery(){
 
 runQuery();
 
-//For now Not supported Subqueries
+// //For now Not supported Subqueries
 let item = SELECT(
   ["models"],
   FROM(
@@ -84,3 +97,26 @@ let resGroupBy = SELECT(
   );
   
 console.log("resGroupBy" ,resGroupBy);
+
+
+async function fetchComments(){
+  let response = await fetch('https://jsonplaceholder.typicode.com/comments')
+  return await response.json()
+}
+
+(async() => {
+  
+console.clear();
+ const comments = SELECT(['id post_id' , 'name' 
+ , function Email(row){
+      // Regular expression to match all vowels (both uppercase and lowercase)
+      const vowelRegex = /[AEIOUaeiou]/g;
+      // Replace all matched vowels with 'X'
+      return row.email.replace(vowelRegex, 'X');
+  }
+, function Body(row) {
+  console.dir(row)
+  return row.body.substring(0 , 100)
+}] , FROM(await fetchComments()))
+console.table(comments)
+})();
